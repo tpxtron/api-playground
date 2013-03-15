@@ -39,6 +39,42 @@ class Sipgate_API
 	}
 
 	/**
+	 * Get all events of the currently logged-in user
+	 *
+	 * Returns all Events (calls, faxes, etc.)
+	 */
+	public function events_get()
+	{
+		return $this->_request('/my/events/','get');
+	}
+
+	/**
+	 * Get either all call events or only a specific one
+	 *
+	 * @param $eventId the event ID of a single call event (optional)
+	 */
+	public function events_calls_get($eventId = null)
+	{
+		if(isset($eventId)) {
+			// Will return only the given call event
+			return $this->_request('/my/events/calls/' . $eventId . '/','get',array("complexity"=>"full"));
+		} else {
+			// Will return all call events
+			return $this->_request('/my/events/calls/','get',array("complexity"=>"full"));
+		}
+	}
+
+	/**
+	 * Delete the given call event
+	 *
+	 * @param $eventId the event ID of the call to be deleted
+	 */
+	public function events_calls_delete($eventId)
+	{
+		$this->_request('/my/events/calls/' . $eventId . '/','delete');
+	}
+
+	/**
 	 * Get all extensions or just the given extension
 	 * 
 	 * @param $extensionSipId the SipId to retrieve detailed information about (optional)
@@ -46,8 +82,10 @@ class Sipgate_API
 	public function extensions_get($extensionSipId = null)
 	{
 		if(isset($extensionSipId)) {
-			return $this->_request('/my/settings/extensions/' . $extensionSipId . '/','get');
+			// Will return only the given extension
+			return $this->_request('/my/settings/extensions/' . $extensionSipId . '/','get',array("complexity"=>"full"));
 		} else {
+			// Will return all extensions
 			return $this->_request('/my/settings/extensions/','get',array("complexity"=>"full"));
 		}
 	}
@@ -101,6 +139,10 @@ class Sipgate_API
 				break;
 			case "post":
 				$this->_api->restPost($url,$requestParams);
+			case "delete":
+				$this->_api->restDelete($url,$requestParams);
+			case "put":
+				$this->_api->restPut($url,$requestParams);
 		}
 	}
 
